@@ -92,8 +92,8 @@
   },
   "scripts": {
     "package": "vsce package",
-    "compile": "node scripts/build.js",
-    "watch": "node scripts/build.js --watch",
+    "compile": "node scripts/build.ts",
+    "watch": "node scripts/build.ts --watch",
     "lint": "oxlint src",
     "test": "poku"
   },

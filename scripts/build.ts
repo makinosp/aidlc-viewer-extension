@@ -1,10 +1,21 @@
-import esbuild from 'esbuild';
+#!/usr/bin/env node
+/**
+ * Build script for the extension.
+ * Can be executed directly with Node's TypeScript support:
+ *   node --loader ts-node/esm scripts/build.ts
+ * or via ts-node:
+ *   npx ts-node scripts/build.ts
+ */
+
+import * as esbuild from 'esbuild';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
+// Resolve script directory
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Configure esbuild context
 const ctx = await esbuild.context({
   entryPoints: [join(__dirname, '../src/extension.ts')],
   bundle: true,
