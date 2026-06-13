@@ -33,7 +33,7 @@
     "onCommand:markdownWatchViewer.selectFolder",
     "onView:markdownWatchViewer.tree"
   ],
-  "main": "./src/extension.js",
+  "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
@@ -91,6 +91,18 @@
     }
   },
   "scripts": {
-    "package": "vsce package"
+    "package": "vsce package",
+    "compile": "node scripts/build.js",
+    "watch": "node scripts/build.js --watch",
+    "lint": "oxlint src",
+    "test": "poku"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "@types/vscode": "^1.120.0",
+    "esbuild": "^0.28.1",
+    "oxc": "^1.0.1",
+    "poku": "^4.4.0",
+    "typescript": "^6.0.3"
   }
 }

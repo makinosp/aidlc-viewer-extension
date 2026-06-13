@@ -1,0 +1,7 @@
+{
+  "files": [
+    "test/**/*.ts"
+  ],
+  "timeout": 5000,
+  "ui": "dot"
+}
