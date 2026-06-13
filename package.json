@@ -1,10 +1,10 @@
 {
-  "name": "aidlc-viewer",
+  "name": "makinosp",
   "displayName": "AIDLC-VIEWER",
   "description": "Watch AIDLC workflow folders, track stage files, and edit Markdown in a custom viewer.",
   "version": "0.0.1",
-  "publisher": "jikjeong",
-  "license": "MIT",
+  "publisher": "makinosp",
+  "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
     "url": "https://github.com/jikang-jeong/aidlc-viewer-extension.git"
