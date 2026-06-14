@@ -1,30 +1,36 @@
-import * as vscode from 'vscode';
+type StageKeys = keyof typeof stages;
+export type Stage = typeof stages[StageKeys];
 
-export type Stage = 'inception' | 'construction' | 'operations' | 'unknown';
+const stages = {
+  inception: 'inception',
+  construction: 'construction',
+  operations: 'operations',
+  unknown: 'unknown',
+} as const satisfies Record<string, string>;
 
-export function detectStageFromPath(filePath: string): Stage | undefined {
+export function detectStageFromPath(filePath: string): Omit<Stage, 'unknown'> | undefined {
   const normalized = filePath.toLowerCase();
-  if (normalized.includes('/operations/')) {
-    return 'operations';
+  if (normalized.includes(`/${stages.operations}/`)) {
+    return stages.operations;
   }
-  if (normalized.includes('/construction/')) {
-    return 'construction';
+  if (normalized.includes(`/${stages.construction}/`)) {
+    return stages.construction;
   }
-  if (normalized.includes('/inception/')) {
-    return 'inception';
+  if (normalized.includes(`/${stages.inception}/`)) {
+    return stages.inception;
   }
   return undefined;
 }
 
-export function inferStageFromCounts(counts: { inception: number; construction: number; operations: number }): Stage {
+export function inferStageFromCounts(counts: Record<StageKeys, number>): Stage {
   if (counts.operations > 0) {
-    return 'operations';
+    return stages.operations;
   }
   if (counts.construction > 0) {
-    return 'construction';
+    return stages.construction;
   }
   if (counts.inception > 0) {
-    return 'inception';
+    return stages.inception;
   }
-  return 'unknown';
+  return stages.unknown;
 }
