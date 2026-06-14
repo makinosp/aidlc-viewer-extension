@@ -94,17 +94,10 @@ export function getWebviewHtml(webview: vscode.Webview, fileUri: vscode.Uri, mar
         border: 1px solid var(--border);
       }
 
-      textarea {
+      #editor {
         flex: 1;
         width: 100%;
-        resize: none;
-        border: 0;
-        outline: none;
-        padding: 16px;
-        box-sizing: border-box;
-        color: var(--text);
-        background: transparent;
-        font: 13px/1.6 var(--vscode-editor-font-family);
+        min-height: 200px;
       }
 
       .preview {
@@ -153,7 +146,7 @@ export function getWebviewHtml(webview: vscode.Webview, fileUri: vscode.Uri, mar
             <button id="save">Save</button>
           </div>
         </div>
-        <textarea id="editor" spellcheck="false"></textarea>
+        <div id="editor"></div>
       </section>
       <section class="pane">
         <div class="header">
@@ -167,37 +160,50 @@ export function getWebviewHtml(webview: vscode.Webview, fileUri: vscode.Uri, mar
     <script>
       const vscode = acquireVsCodeApi();
       const initialValue = ${safeInitialValue};
-      const editor = document.getElementById('editor');
+      let editorInstance = null;
+      let cleanValue = initialValue;
       const preview = document.getElementById('preview');
       const status = document.getElementById('status');
       const actions = document.querySelector('.actions');
-      let cleanValue = initialValue;
 
-      editor.value = initialValue;
-      renderMarkdown(initialValue);
-      syncActionVisibility();
+      // Load Monaco Editor from CDN
+      require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.48.0/min/vs' }});
+      require(['vs/editor/editor.main'], function () {
+        editorInstance = monaco.editor.create(document.getElementById('editor'), {
+          value: initialValue,
+          language: 'markdown',
+          theme: getCurrentTheme(), // We'll define this function below
+          automaticLayout: true,
+        });
 
-      editor.addEventListener('input', () => {
-        renderMarkdown(editor.value);
-        status.textContent = isDirty() ? 'Unsaved changes' : 'Ready';
+        // Update preview when editor content changes
+        editorInstance.onDidChangeModelContent(() => {
+          const content = editorInstance.getValue();
+          renderMarkdown(content);
+          status.textContent = isDirty() ? 'Unsaved changes' : 'Ready';
+          syncActionVisibility();
+        });
+
+        // Set initial state
+        renderMarkdown(initialValue);
         syncActionVisibility();
       });
 
-      document.getElementById('save').addEventListener('click', () => {
-        vscode.postMessage({
-          type: 'save',
-          content: editor.value
-        });
-        cleanValue = editor.value;
-        status.textContent = 'Saved';
-        syncActionVisibility(false);
-      });
+      // Get the current VS Code theme (light or dark)
+      function getCurrentTheme() {
+        const theme = vscode.getTheme ? vscode.getTheme() : undefined;
+        if (theme && theme.kind === vscode.ColorThemeKind.Dark) {
+          return 'vs-dark';
+        }
+        return 'vs';
+      }
 
-      document.getElementById('reload').addEventListener('click', () => {
-        vscode.postMessage({ type: 'requestLatest' });
-        cleanValue = initialValue;
-        status.textContent = 'Ready';
-        syncActionVisibility(false);
+      // Listen for theme changes from VS Code
+      vscode.onDidChangeTheme(() => {
+        const newTheme = getCurrentTheme();
+        if (editorInstance) {
+          editorInstance.updateOptions({ theme: newTheme });
+        }
       });
 
       function renderMarkdown(source: string) {
@@ -205,12 +211,37 @@ export function getWebviewHtml(webview: vscode.Webview, fileUri: vscode.Uri, mar
       }
 
       function isDirty(): boolean {
-        return editor.value !== cleanValue;
+        return editorInstance ? editorInstance.getValue() !== cleanValue : false;
       }
 
       function syncActionVisibility(forceVisible: boolean = isDirty()) {
         actions.classList.toggle('visible', forceVisible);
       }
+
+      // Handle messages from the extension
+      window.addEventListener('message', event => {
+        const message = event.data;
+        switch (message.type) {
+          case 'save':
+            cleanValue = message.content;
+            if (editorInstance) {
+              editorInstance.setValue(message.content);
+            }
+            status.textContent = 'Saved';
+            syncActionVisibility(false);
+            break;
+          case 'requestLatest':
+            // This message is sent when the user clicks reload or when the file changes on disk.
+            // We don't have the content here, so we ask the extension to send the latest content.
+            // But note: the extension will send a 'save' message with the latest content when it responds to this request.
+            // However, to avoid an infinite loop, we don't do anything here. The extension should send the latest content.
+            // Actually, the extension will send a 'save' message when it receives this request.
+            // So we just set the status and wait for the extension to respond.
+            status.textContent = 'Reloading...';
+            syncActionVisibility(false);
+            break;
+        }
+      });
     </script>
   </body>
 </html>`;

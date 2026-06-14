@@ -231,6 +231,14 @@ export class MarkdownTreeDataProvider implements vscode.TreeDataProvider<TreeIte
       return stats;
     }
   }
+
+  /**
+   * Dispose of resources used by the tree data provider.
+   * This should be called when the extension is deactivated.
+   */
+  dispose() {
+    this._onDidChangeTreeData.dispose();
+  }
 }
 
 class InfoItem extends vscode.TreeItem {

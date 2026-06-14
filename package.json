@@ -1,5 +1,5 @@
 {
-  "name": "makinosp",
+  "name": "aidlc-viewer",
   "displayName": "AIDLC-VIEWER",
   "description": "Watch AIDLC workflow folders, track stage files, and edit Markdown in a custom viewer.",
   "version": "0.0.1",
@@ -98,11 +98,14 @@
     "test": "poku"
   },
   "devDependencies": {
+    "@monaco-editor/loader": "^1.7.0",
     "@types/node": "^25.9.3",
     "@types/vscode": "^1.120.0",
     "esbuild": "^0.28.1",
     "oxc": "^1.0.1",
+    "oxlint": "^1.69.0",
     "poku": "^4.4.0",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
 }

@@ -1,15 +1,16 @@
 export type FileState = 'new' | 'read' | 'known';
 
-export type Stage = 'inception' | 'construction' | 'operations';
+export type Stage = 'inception' | 'construction' | 'operations' | 'unknown';
 
 export interface MarkdownMetadata {
-  heading: string;
-  summary: string;
+  heading?: string;
+  summary?: string;
 }
 
 export interface DirectoryStats {
+  hasMarkdown: boolean;
   markdownCount: number;
-  subDirs: number;
+  childDirectoryCount: number;
 }
 
 export interface StageSummary {

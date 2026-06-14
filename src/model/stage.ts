@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-export type Stage = 'inception' | 'construction' | 'operations';
+export type Stage = 'inception' | 'construction' | 'operations' | 'unknown';
 
 export function detectStageFromPath(filePath: string): Stage | undefined {
   const normalized = filePath.toLowerCase();

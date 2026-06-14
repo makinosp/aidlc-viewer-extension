@@ -232,4 +232,19 @@ export class WatchController {
     await this.context.workspaceState.update(KNOWN_KEY, [...this.knownFiles]);
     await this.context.workspaceState.update(NEW_KEY, [...this.newFiles]);
   }
+
+  /**
+   * Dispose of resources used by the controller.
+   * This should be called when the extension is deactivated.
+   */
+  dispose() {
+    this.disposeWatcher();
+    // Dispose all preview panels
+    for (const panel of this.previewPanels.values()) {
+      panel.dispose();
+    }
+    this.previewPanels.clear();
+    // Dispose the tree data provider
+    this.treeDataProvider.dispose();
+  }
 }

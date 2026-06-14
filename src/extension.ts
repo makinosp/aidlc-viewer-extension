@@ -19,4 +19,6 @@ export function activate(context: vscode.ExtensionContext) {
   controller.restoreWatcher();
 }
 
-export function deactivate() { }
+export function deactivate() {
+  controller.dispose();
+}
