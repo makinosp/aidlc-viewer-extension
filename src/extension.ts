@@ -1,24 +1,45 @@
-import * as vscode from 'vscode';
 import { WatchController } from './controller/watchController';
+import { commands, Disposable, ExtensionContext, window } from 'vscode';
 
-const STATE_KEY = 'markdownWatchViewer.watchedFolder';
-const OPENED_KEY = 'markdownWatchViewer.openedFiles';
-const KNOWN_KEY = 'markdownWatchViewer.knownFiles';
-const NEW_KEY = 'markdownWatchViewer.newFiles';
+class MarkdownWatchViewerExtension implements Disposable {
+  private readonly controller: WatchController;
+  private readonly disposables: Disposable[] = [];
+  private _isDisposed = false;
 
-export function activate(context: vscode.ExtensionContext) {
-  const controller = new WatchController(context);
+  constructor(private readonly context: ExtensionContext) {
+    this.controller = new WatchController(context);
+  }
 
-  context.subscriptions.push(
-    vscode.window.registerTreeDataProvider('markdownWatchViewer.tree', controller.treeDataProvider),
-    vscode.commands.registerCommand('markdownWatchViewer.selectFolder', () => controller.selectFolder()),
-    vscode.commands.registerCommand('markdownWatchViewer.refresh', () => controller.refresh()),
-    vscode.commands.registerCommand('markdownWatchViewer.openFile', (item) => controller.openFile(item))
-  );
+  activate(): void {
+    this.disposables.push(
+      window.registerTreeDataProvider(
+        'markdownWatchViewer.tree',
+        this.controller.treeDataProvider
+      ),
+      commands.registerCommand('markdownWatchViewer.selectFolder', () =>
+        this.controller.selectFolder()
+      ),
+      commands.registerCommand('markdownWatchViewer.refresh', () =>
+        this.controller.refresh()
+      ),
+      commands.registerCommand('markdownWatchViewer.openFile', (item) =>
+        this.controller.openFile(item)
+      )
+    );
+    this.controller.restoreWatcher();
+  }
 
-  controller.restoreWatcher();
+  dispose(): void {
+    if (this._isDisposed) { return };
+    this._isDisposed = true;
+    this.controller.dispose();
+    this.disposables.forEach(disposable => disposable.dispose());
+    this.disposables.length = 0;
+  }
 }
 
-export function deactivate() {
-  controller.dispose();
+export function activate(context: ExtensionContext) {
+  const extension = new MarkdownWatchViewerExtension(context);
+  extension.activate();
+  context.subscriptions.push(extension);
 }
