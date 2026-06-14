@@ -7,11 +7,11 @@
   "license": "BSD-3-Clause",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jikang-jeong/aidlc-viewer-extension.git"
+    "url": "https://github.com/makinosp/aidlc-viewer-extension.git"
   },
-  "homepage": "https://github.com/jikang-jeong/aidlc-viewer-extension",
+  "homepage": "https://github.com/makinosp/aidlc-viewer-extension",
   "bugs": {
-    "url": "https://github.com/jikang-jeong/aidlc-viewer-extension/issues"
+    "url": "https://github.com/makinosp/aidlc-viewer-extension/issues"
   },
   "icon": "media/marketplace-icon.png",
   "engines": {
@@ -29,9 +29,7 @@
     "sdlc"
   ],
   "activationEvents": [
-    "onStartupFinished",
-    "onCommand:markdownWatchViewer.selectFolder",
-    "onView:markdownWatchViewer.tree"
+    "onStartupFinished"
   ],
   "main": "./dist/extension.js",
   "contributes": {
